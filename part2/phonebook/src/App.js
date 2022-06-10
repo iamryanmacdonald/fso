@@ -30,16 +30,28 @@ const PersonForm = ({
   </form>
 );
 
-const Persons = ({ persons }) => (
-  <div>
-    {persons.map((person) => (
-      <div key={person.id}>
-        {person.name} {person.number}
-      </div>
-    ))}
-  </div>
-);
+const Persons = ({ persons, setPersons }) => {
+  const removePerson = (person) => {
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personService
+        .remove(person.id)
+        .then((response) =>
+          setPersons(persons.filter((value) => value.id !== person.id))
+        );
+    }
+  };
 
+  return (
+    <div>
+      {persons.map((person) => (
+        <div key={person.id}>
+          {person.name} {person.number}{" "}
+          <button onClick={() => removePerson(person)}>delete</button>
+        </div>
+      ))}
+    </div>
+  );
+};
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
@@ -85,7 +97,7 @@ const App = () => {
         setNewNumber={setNewNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} setPersons={setPersons} />
     </div>
   );
 };
