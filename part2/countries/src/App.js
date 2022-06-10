@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+import Country from "./components/Country";
+
 const Countries = ({ countries, setCountries }) => {
   if (countries.length > 10) {
     return <div>Too many matches, specify another filter</div>;
@@ -18,20 +20,7 @@ const Countries = ({ countries, setCountries }) => {
   } else if (countries.length === 1) {
     const country = countries[0];
 
-    return (
-      <div>
-        <h1>{country.name.common}</h1>
-        <div>capital {country.capital}</div>
-        <div>area {country.area}</div>
-        <h3>languages:</h3>
-        <ul>
-          {Object.values(country.languages).map((language) => (
-            <li>{language}</li>
-          ))}
-        </ul>
-        <img src={country.flags.png} />
-      </div>
-    );
+    return <Country country={country} />;
   }
 };
 
