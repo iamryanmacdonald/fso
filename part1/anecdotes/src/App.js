@@ -20,8 +20,23 @@ const App = () => {
     setPoints(newPoints);
   };
 
+  const maxPoints = () => {
+    let maxValue = 0;
+    let maxIndex = 0;
+
+    points.forEach((value, index) => {
+      if (value > maxValue) {
+        maxValue = value;
+        maxIndex = index;
+      }
+    });
+
+    return maxIndex;
+  };
+
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       {anecdotes[selected]}
       <br />
       has {points[selected]} votes
@@ -34,6 +49,10 @@ const App = () => {
       >
         next anecdote
       </button>
+      <h1>Anecdote with most votes</h1>
+      {anecdotes[maxPoints()]}
+      <br />
+      has {points[maxPoints()]} votes
     </div>
   );
 };
