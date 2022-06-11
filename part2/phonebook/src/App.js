@@ -30,14 +30,33 @@ const PersonForm = ({
   </form>
 );
 
-const Persons = ({ persons, setPersons }) => {
+const Persons = ({ persons, setNotification, setPersons, setType }) => {
   const removePerson = (person) => {
     if (window.confirm(`Delete ${person.name}?`)) {
       personService
         .remove(person.id)
-        .then((response) =>
-          setPersons(persons.filter((value) => value.id !== person.id))
-        );
+        .then((response) => {
+          setPersons(persons.filter((value) => value.id !== person.id));
+
+          setType("success");
+          setNotification(`Removed ${person.name}`);
+
+          setTimeout(() => {
+            setType(null);
+            setNotification(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          setType("error");
+          setNotification(
+            `${person.name} has already been removed from the server`
+          );
+
+          setTimeout(() => {
+            setType(null);
+            setNotification(null);
+          }, 5000);
+        });
     }
   };
 
@@ -53,10 +72,8 @@ const Persons = ({ persons, setPersons }) => {
   );
 };
 
-const Notification = ({ message }) => {
-  return message === null ? null : (
-    <div className="notification">{message}</div>
-  );
+const Notification = ({ message, type }) => {
+  return message === null ? null : <div className={type}>{message}</div>;
 };
 
 const App = () => {
@@ -65,6 +82,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
   const [notification, setNotification] = useState(null);
+  const [type, setType] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((response) => setPersons(response.data));
@@ -101,9 +119,11 @@ const App = () => {
           setNewName("");
           setNewNumber("");
 
+          setType("success");
           setNotification(`Updated ${updatedPerson.name}`);
 
           setTimeout(() => {
+            setType(null);
             setNotification(null);
           }, 5000);
         });
@@ -114,9 +134,11 @@ const App = () => {
         setNewName("");
         setNewNumber("");
 
+        setType("success");
         setNotification(`Added ${newPerson.name}`);
 
         setTimeout(() => {
+          setType(null);
           setNotification(null);
         }, 5000);
       });
@@ -126,7 +148,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification message={notification} type={type} />
       <Filter setFilter={setFilter} />
       <h3>Add a new</h3>
       <PersonForm
@@ -137,7 +159,12 @@ const App = () => {
         setNewNumber={setNewNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} setPersons={setPersons} />
+      <Persons
+        persons={filteredPersons}
+        setNotification={setNotification}
+        setPersons={setPersons}
+        setType={setType}
+      />
     </div>
   );
 };
