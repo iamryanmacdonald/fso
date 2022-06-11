@@ -52,11 +52,19 @@ const Persons = ({ persons, setPersons }) => {
     </div>
   );
 };
+
+const Notification = ({ message }) => {
+  return message === null ? null : (
+    <div className="notification">{message}</div>
+  );
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((response) => setPersons(response.data));
@@ -92,6 +100,12 @@ const App = () => {
           );
           setNewName("");
           setNewNumber("");
+
+          setNotification(`Updated ${updatedPerson.name}`);
+
+          setTimeout(() => {
+            setNotification(null);
+          }, 5000);
         });
       }
     } else {
@@ -99,6 +113,12 @@ const App = () => {
         setPersons(persons.concat(response.data));
         setNewName("");
         setNewNumber("");
+
+        setNotification(`Added ${newPerson.name}`);
+
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
       });
     }
   };
@@ -106,6 +126,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter setFilter={setFilter} />
       <h3>Add a new</h3>
       <PersonForm
