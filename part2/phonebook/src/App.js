@@ -110,38 +110,60 @@ const App = () => {
           .id;
 
         const updatedPerson = { ...newPerson, id: personId };
-        personService.update(updatedPerson).then((response) => {
-          setPersons(
-            persons.map((person) =>
-              person.id !== personId ? person : response.data
-            )
-          );
+        personService
+          .update(updatedPerson)
+          .then((response) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== personId ? person : response.data
+              )
+            );
+            setNewName("");
+            setNewNumber("");
+
+            setType("success");
+            setNotification(`Updated ${updatedPerson.name}`);
+
+            setTimeout(() => {
+              setType(null);
+              setNotification(null);
+            }, 5000);
+          })
+          .catch((error) => {
+            setType("error");
+            setNotification(error.response.data.error);
+
+            setTimeout(() => {
+              setType(null);
+              setNotification(null);
+            }, 5000);
+          });
+      }
+    } else {
+      personService
+        .create(newPerson)
+        .then((response) => {
+          setPersons(persons.concat(response.data));
           setNewName("");
           setNewNumber("");
 
           setType("success");
-          setNotification(`Updated ${updatedPerson.name}`);
+          setNotification(`Added ${newPerson.name}`);
+
+          setTimeout(() => {
+            setType(null);
+            setNotification(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          setType("error");
+          setNotification(error.response.data.error);
 
           setTimeout(() => {
             setType(null);
             setNotification(null);
           }, 5000);
         });
-      }
-    } else {
-      personService.create(newPerson).then((response) => {
-        setPersons(persons.concat(response.data));
-        setNewName("");
-        setNewNumber("");
-
-        setType("success");
-        setNotification(`Added ${newPerson.name}`);
-
-        setTimeout(() => {
-          setType(null);
-          setNotification(null);
-        }, 5000);
-      });
     }
   };
 
