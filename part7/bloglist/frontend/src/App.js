@@ -1,13 +1,23 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Togglable";
+import {
+  createBlog,
+  deleteBlog,
+  initializeBlogs,
+} from "./reducers/blogReducer";
+import { setNotification } from "./reducers/notificationReducer";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [notification, setNotification] = useState({ message: "", type: "" });
+  const dispatch = useDispatch();
+  const blogs = useSelector((state) => state.blogs);
+  const notification = useSelector((state) => state.notification);
+
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
@@ -15,29 +25,7 @@ const App = () => {
   const blogFormRef = useRef();
 
   const addBlog = (newBlog) => {
-    blogService
-      .create(newBlog)
-      .then((returnedBlog) => {
-        setBlogs(blogs.concat(returnedBlog));
-
-        blogFormRef.current.toggleVisibility();
-
-        setNotification({
-          message: `a new blog ${returnedBlog.title} by ${returnedBlog.author} added`,
-          type: "notification",
-        });
-
-        setTimeout(() => {
-          setNotification({ message: "", type: "" });
-        }, 5000);
-      })
-      .catch((error) => {
-        setNotification({ message: error.response.data.error, type: "error" });
-
-        setTimeout(() => {
-          setNotification({ message: "", type: "" });
-        }, 5000);
-      });
+    dispatch(createBlog(newBlog));
   };
 
   const handleLogin = async (e) => {
@@ -138,18 +126,7 @@ const App = () => {
   };
 
   const removeBlog = (blog) => {
-    blogService
-      .remove(blog)
-      .then(() => {
-        setBlogs(blogs.filter((checkBlog) => blog.id !== checkBlog.id));
-      })
-      .catch((error) => {
-        setNotification({ message: error.response.data.error, type: "error" });
-
-        setTimeout(() => {
-          setNotification({ message: "", type: "" });
-        }, 5000);
-      });
+    dispatch(deleteBlog(blog));
   };
 
   useEffect(() => {
@@ -161,10 +138,8 @@ const App = () => {
       blogService.setToken(user.token);
     }
 
-    blogService
-      .getAll()
-      .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
-  }, []);
+    dispatch(initializeBlogs());
+  }, [dispatch]);
 
   return user ? (
     <div>
