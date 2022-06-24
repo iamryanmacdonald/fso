@@ -4,6 +4,7 @@ import { Link, Route, Routes, useMatch } from "react-router-dom";
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
+import Navigation from "./components/Navigation";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import User from "./components/User";
@@ -11,7 +12,7 @@ import Users from "./components/Users";
 import { useField } from "./hooks";
 import { createBlog, initializeBlogs } from "./reducers/blogReducer";
 import { setNotification } from "./reducers/notificationReducer";
-import { clearUser, setUser } from "./reducers/userReducer";
+import { setUser } from "./reducers/userReducer";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -59,12 +60,6 @@ const App = () => {
     }
   };
 
-  const logout = () => {
-    window.localStorage.removeItem("user");
-    dispatch(clearUser());
-    blogService.setToken(null);
-  };
-
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <h2>log in to application</h2>
@@ -107,11 +102,9 @@ const App = () => {
 
   return user ? (
     <div>
-      <h2>blogs</h2>
+      <Navigation user={user} />
+      <h2>blog app</h2>
       <Notification />
-      <div>
-        {user.name} logged in <button onClick={logout}>logout</button>
-      </div>
       <Routes>
         <Route path="/blogs/:id" element={<Blog blog={matchedBlog} />} />
         <Route path="/users/:id" element={<User user={matchedUser} />} />
