@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes, useMatch } from "react-router-dom";
+import { Link, Route, Routes, useMatch } from "react-router-dom";
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
@@ -9,11 +9,7 @@ import Togglable from "./components/Togglable";
 import User from "./components/User";
 import Users from "./components/Users";
 import { useField } from "./hooks";
-import {
-  createBlog,
-  deleteBlog,
-  initializeBlogs,
-} from "./reducers/blogReducer";
+import { createBlog, initializeBlogs } from "./reducers/blogReducer";
 import { setNotification } from "./reducers/notificationReducer";
 import { clearUser, setUser } from "./reducers/userReducer";
 import blogService from "./services/blogs";
@@ -87,10 +83,6 @@ const App = () => {
 
   const notificationBar = () => {};
 
-  const removeBlog = (blog) => {
-    dispatch(deleteBlog(blog));
-  };
-
   useEffect(() => {
     const user_token = window.localStorage.getItem("user");
 
@@ -103,8 +95,12 @@ const App = () => {
     dispatch(initializeBlogs());
   }, [dispatch]);
 
+  const matchedBlogId = useMatch("/blogs/:id");
+  const matchedBlog = matchedBlogId
+    ? blogs.find((checkBlog) => checkBlog.id === matchedBlogId.params.id)
+    : null;
+
   const matchedUserId = useMatch("/users/:id");
-  console.log(matchedUserId);
   const matchedUser = matchedUserId
     ? users.find((checkUser) => checkUser.id === matchedUserId.params.id)
     : null;
@@ -117,6 +113,7 @@ const App = () => {
         {user.name} logged in <button onClick={logout}>logout</button>
       </div>
       <Routes>
+        <Route path="/blogs/:id" element={<Blog blog={matchedBlog} />} />
         <Route path="/users/:id" element={<User user={matchedUser} />} />
         <Route path="/users" element={<Users users={users} />} />
         <Route
@@ -128,7 +125,20 @@ const App = () => {
               </Togglable>
               <br />
               {blogs.map((blog) => (
-                <Blog key={blog.id} blog={blog} removeBlog={removeBlog} />
+                <div
+                  key={blog.id}
+                  style={{
+                    paddingTop: 10,
+                    paddingLeft: 2,
+                    border: "solid",
+                    borderWidth: 1,
+                    marginBottom: 5,
+                  }}
+                >
+                  <Link to={`/blogs/${blog.id}`}>
+                    {blog.title} {blog.author}
+                  </Link>
+                </div>
               ))}
             </>
           }
