@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useMatch } from "react-router-dom";
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
+import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
+import User from "./components/User";
 import Users from "./components/Users";
 import { useField } from "./hooks";
 import {
@@ -20,8 +22,8 @@ import loginService from "./services/login";
 const App = () => {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
-  const notification = useSelector((state) => state.notification);
   const user = useSelector((state) => state.user);
+  const users = useSelector((state) => state.users);
 
   const password = useField("password");
   const username = useField("username");
@@ -83,39 +85,7 @@ const App = () => {
     </form>
   );
 
-  const notificationBar = () => {
-    if (notification.message === "") return null;
-
-    let color;
-
-    switch (notification.type) {
-      case "error":
-        color = "red";
-        break;
-      case "notification":
-        color = "green";
-        break;
-      default:
-        color = "black";
-    }
-
-    return (
-      <div
-        style={{
-          background: "lightgray",
-          borderRadius: "5px",
-          borderStyle: "solid",
-          color,
-          fontSize: "20px",
-          marginBottom: "20px",
-          padding: "10px",
-        }}
-        id="notification"
-      >
-        {notification.message}
-      </div>
-    );
-  };
+  const notificationBar = () => {};
 
   const removeBlog = (blog) => {
     dispatch(deleteBlog(blog));
@@ -133,15 +103,22 @@ const App = () => {
     dispatch(initializeBlogs());
   }, [dispatch]);
 
+  const matchedUserId = useMatch("/users/:id");
+  console.log(matchedUserId);
+  const matchedUser = matchedUserId
+    ? users.find((checkUser) => checkUser.id === matchedUserId.params.id)
+    : null;
+
   return user ? (
     <div>
       <h2>blogs</h2>
-      {notificationBar()}
+      <Notification />
       <div>
         {user.name} logged in <button onClick={logout}>logout</button>
       </div>
       <Routes>
-        <Route path="/users" element={<Users />} />
+        <Route path="/users/:id" element={<User user={matchedUser} />} />
+        <Route path="/users" element={<Users users={users} />} />
         <Route
           path="/"
           element={
