@@ -42,6 +42,20 @@ router.post("/", middleware.userExtractor, async (request, response) => {
   response.status(201).json(savedBlog);
 });
 
+router.post("/:id/comments", async (request, response) => {
+  if (!request.body.content)
+    return response.status(401).json({ error: "content needs to be defined" });
+
+  const blog = await Blog.findById(request.params.id);
+
+  if (!blog) return response.status(404).end();
+
+  blog.comments = blog.comments.concat(request.body.content);
+  await blog.save();
+
+  response.status(200).json(blog);
+});
+
 router.put("/:id", middleware.userExtractor, async (request, response) => {
   const user = request.user;
 
