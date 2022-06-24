@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Route, Routes } from "react-router-dom";
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Togglable";
+import Users from "./components/Users";
 import { useField } from "./hooks";
 import {
   createBlog,
@@ -138,14 +140,23 @@ const App = () => {
       <div>
         {user.name} logged in <button onClick={logout}>logout</button>
       </div>
-      <br />
-      <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <BlogForm createBlog={addBlog} />
-      </Togglable>
-      <br />
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} removeBlog={removeBlog} />
-      ))}
+      <Routes>
+        <Route path="/users" element={<Users />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                <BlogForm createBlog={addBlog} />
+              </Togglable>
+              <br />
+              {blogs.map((blog) => (
+                <Blog key={blog.id} blog={blog} removeBlog={removeBlog} />
+              ))}
+            </>
+          }
+        />
+      </Routes>
     </div>
   ) : (
     loginForm()
