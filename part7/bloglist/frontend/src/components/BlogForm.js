@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useField } from "../hooks";
 
 const BlogForm = ({ createBlog }) => {
-  const [author, setAuthor] = useState("");
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
+  const author = useField("text");
+  const title = useField("text");
+  const url = useField("text");
 
   const handleCreate = async (event) => {
     event.preventDefault();
 
-    createBlog({ author, title, url });
+    createBlog({
+      author: author.attributes.value,
+      title: title.attributes.value,
+      url: url.attributes.value,
+    });
 
-    setTitle("");
-    setAuthor("");
-    setUrl("");
+    title.reset();
+    author.reset();
+    url.reset();
   };
 
   return (
@@ -21,33 +25,15 @@ const BlogForm = ({ createBlog }) => {
       <form onSubmit={handleCreate}>
         <div>
           title:
-          <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-            id="title"
-          />
+          <input {...title.attributes} id="title" />
         </div>
         <div>
           author:
-          <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-            id="author"
-          />
+          <input {...author.attributes} id="author" />
         </div>
         <div>
           url:
-          <input
-            type="text"
-            value={url}
-            name="URL"
-            onChange={({ target }) => setUrl(target.value)}
-            id="url"
-          />
+          <input {...url.attributes} id="url" />
         </div>
         <button type="submit" id="create">
           create

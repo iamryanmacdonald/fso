@@ -1,15 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Togglable";
+import { useField } from "./hooks";
 import {
   createBlog,
   deleteBlog,
   initializeBlogs,
 } from "./reducers/blogReducer";
 import { setNotification } from "./reducers/notificationReducer";
+import { clearUser, setUser } from "./reducers/userReducer";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -17,49 +19,49 @@ const App = () => {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
   const notification = useSelector((state) => state.notification);
+  const user = useSelector((state) => state.user);
 
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
-  const [username, setUsername] = useState("");
+  const password = useField("password");
+  const username = useField("username");
 
   const blogFormRef = useRef();
 
   const addBlog = (newBlog) => {
     dispatch(createBlog(newBlog));
+    blogFormRef.current.toggleVisibility();
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const user = await loginService.login({ username, password });
-
-      window.localStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
-      blogService.setToken(user.token);
-      setUsername("");
-      setPassword("");
-
-      setNotification({
-        message: `Logged in as ${user.name}`,
-        type: "notification",
+      const user = await loginService.login({
+        username: username.attributes.value,
+        password: password.attributes.value,
       });
 
-      setTimeout(() => {
-        setNotification({ message: "", type: "" });
-      }, 5000);
-    } catch (err) {
-      setNotification({ message: err.response.data.error, type: "error" });
+      window.localStorage.setItem("user", JSON.stringify(user));
+      dispatch(setUser(user));
+      blogService.setToken(user.token);
+      username.reset();
+      password.reset();
 
-      setTimeout(() => {
-        setNotification({ message: "", type: "" });
-      }, 5000);
+      dispatch(
+        setNotification({
+          message: `Logged in as ${user.name}`,
+          type: "notification",
+        })
+      );
+    } catch (err) {
+      dispatch(
+        setNotification({ message: err.response.data.error, type: "error" })
+      );
     }
   };
 
   const logout = () => {
     window.localStorage.removeItem("user");
-    setUser(null);
+    dispatch(clearUser());
     blogService.setToken(null);
   };
 
@@ -69,23 +71,11 @@ const App = () => {
       {notificationBar()}
       <div>
         username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-          id="username"
-        />
+        <input {...username.attributes} id="username" />
       </div>
       <div>
         password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-          id="password"
-        />
+        <input {...password.attributes} id="password" />
       </div>
       <button type="submit">login</button>
     </form>
@@ -134,7 +124,7 @@ const App = () => {
 
     if (user_token) {
       const user = JSON.parse(user_token);
-      setUser(user);
+      dispatch(setUser(user));
       blogService.setToken(user.token);
     }
 
