@@ -3,6 +3,12 @@ const baseUrl = "/api/blogs";
 
 let token = null;
 
+const addComment = async (id, content) => {
+  const response = await axios.post(`${baseUrl}/${id}/comments`, { content });
+
+  return response.data;
+};
+
 const create = async (blog) => {
   const config = {
     headers: {
@@ -36,4 +42,4 @@ const setToken = (newToken) => {
   token = `bearer ${newToken}`;
 };
 
-export default { create, getAll, remove, setToken };
+export default { addComment, create, getAll, remove, setToken };

@@ -15,13 +15,42 @@ const blogSlice = createSlice({
     removeBlog: (state, action) => {
       return state.filter((blog) => blog.id !== action.payload.id);
     },
+    setBlog: (state, action) => {
+      return state.map((blog) =>
+        blog.id !== action.payload.id ? blog : action.payload
+      );
+    },
     setBlogs: (state, action) => {
       return action.payload;
     },
   },
 });
 
-export const { appendBlog, removeBlog, setBlogs } = blogSlice.actions;
+export const { appendBlog, removeBlog, setBlog, setBlogs } = blogSlice.actions;
+
+export const createComment = (id, content) => {
+  return async (dispatch) => {
+    try {
+      const modifiedBlog = await blogService.addComment(id, content);
+
+      dispatch(setBlog(modifiedBlog));
+
+      dispatch(
+        setNotification({
+          message: "comment added",
+          type: "notification",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        setNotification({
+          message: error.response.data.error,
+          type: "error",
+        })
+      );
+    }
+  };
+};
 
 export const createBlog = (blog) => {
   return async (dispatch) => {
