@@ -9,7 +9,7 @@ const Authors = (props) => {
   const [born, setBorn] = useState("");
 
   const [updateAuthor] = useMutation(UPDATE_AUTHOR);
-  const result = useQuery(ALL_AUTHORS, { pollInterval: 2000 });
+  const result = useQuery(ALL_AUTHORS);
 
   if (!props.show) {
     return null;
@@ -18,7 +18,10 @@ const Authors = (props) => {
   const submit = async (event) => {
     event.preventDefault();
 
-    await updateAuthor({ variables: { name: name.value, born: Number(born) } });
+    await updateAuthor({
+      refetchQueries: [{ query: ALL_AUTHORS }],
+      variables: { name: name.value, born: Number(born) },
+    });
 
     setName("");
     setBorn("");
