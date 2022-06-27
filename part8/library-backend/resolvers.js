@@ -11,11 +11,7 @@ const pubsub = new PubSub();
 
 const resolvers = {
   Author: {
-    bookCount: async (root) => {
-      console.log(root);
-
-      return Book.countDocuments({ author: root.id });
-    },
+    bookCount: async (root) => Book.countDocuments({ author: root.id }),
   },
   Query: {
     allAuthors: async () => Author.find({}),
