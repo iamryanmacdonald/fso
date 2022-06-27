@@ -3,7 +3,7 @@ interface SafeExerciseInputs {
   dailyHours: number[];
 }
 
-interface Result {
+export interface Result {
   periodLength: number;
   trainingDays: number;
   success: boolean;
@@ -42,7 +42,7 @@ const calculateExercises = (target: number, dailyHours: number[]): Result => {
   let ratingDescription: string;
   switch (rating) {
     case 1:
-      ratingDescription = "you're still a long way off";
+      ratingDescription = "bad";
       break;
     case 2:
       ratingDescription = "not too bad but could be better";
@@ -73,3 +73,5 @@ try {
   }
   console.log(errorMessage);
 }
+
+export { calculateExercises };
