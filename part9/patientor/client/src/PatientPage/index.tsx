@@ -16,7 +16,7 @@ const IconMap = {
 };
 
 const PatientPage = () => {
-  const [{ patient, patients }, dispatch] = useStateValue();
+  const [{ diagnoses, patient, patients }, dispatch] = useStateValue();
   const { patientId } = useParams<{ patientId: string }>();
 
   React.useEffect(() => {
@@ -62,7 +62,9 @@ const PatientPage = () => {
               {entry.diagnosisCodes && (
                 <ul>
                   {entry.diagnosisCodes.map((code) => (
-                    <li key={code}>{code}</li>
+                    <li key={code}>
+                      {code} {diagnoses[code] && diagnoses[code].name}
+                    </li>
                   ))}
                 </ul>
               )}
