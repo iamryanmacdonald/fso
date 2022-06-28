@@ -16,6 +16,12 @@ const addPatient = (patient: NewPatient): Patient => {
   return newPatient;
 };
 
+const findById = (id: string): Patient | undefined => {
+  const patient = patients.find((p) => p.id === id);
+
+  return patient;
+};
+
 const getPublicPatients = (): PublicPatient[] => {
   return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
     id,
@@ -26,4 +32,4 @@ const getPublicPatients = (): PublicPatient[] => {
   }));
 };
 
-export default { addPatient, getPublicPatients };
+export default { addPatient, findById, getPublicPatients };
