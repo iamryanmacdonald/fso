@@ -23,12 +23,13 @@ const findById = (id: string): Patient | undefined => {
 };
 
 const getPublicPatients = (): PublicPatient[] => {
-  return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
+  return patients.map(({ id, name, dateOfBirth, gender, occupation, entries }) => ({
     id,
     name,
     dateOfBirth,
     gender,
     occupation,
+    entries
   }));
 };
 
