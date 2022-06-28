@@ -6,7 +6,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 
 import { apiBaseUrl } from "../constants";
-import { useStateValue } from "../state";
+import { addPatient, setPatient, useStateValue } from "../state";
 import { Patient } from "../types";
 
 const IconMap = {
@@ -25,15 +25,16 @@ const PatientPage = () => {
         const { data: patientFromApi } = await axios.get<Patient>(
           `${apiBaseUrl}/patients/${patientId}`
         );
-        dispatch({ type: "SET_PATIENT", payload: patientFromApi });
+        dispatch(setPatient(patientFromApi));
+        dispatch(addPatient(patientFromApi));
       } catch (e) {
         console.error(e);
       }
     };
 
     if (patientId) {
-      if (patients[patientId]) {
-        dispatch({ type: "SET_PATIENT", payload: patients[patientId] });
+      if (patients[patientId] && patients[patientId].ssn) {
+        dispatch(setPatient(patients[patientId]));
       } else {
         void fetchPatient(patientId);
       }
