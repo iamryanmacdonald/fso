@@ -53,6 +53,21 @@ const PatientPage = () => {
           </div>
           <div>SSN: {patient.ssn}</div>
           <div>Occupation: {patient.occupation}</div>
+          <h3>Entries</h3>
+          {patient.entries.map((entry) => (
+            <div key={entry.id}>
+              <p>
+                {entry.date} <i>{entry.description}</i>
+              </p>
+              {entry.diagnosisCodes && (
+                <ul>
+                  {entry.diagnosisCodes.map((code) => (
+                    <li key={code}>{code}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </>
