@@ -12,7 +12,7 @@ import { InputLabel } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
 
 export type SelectFieldOption = {
-  value: Gender | HealthCheckRating;
+  value: Gender | HealthCheckRating | "HealthCheck" | "Hospital" | "OccupationalHealthcare";
   label: string;
 };
 

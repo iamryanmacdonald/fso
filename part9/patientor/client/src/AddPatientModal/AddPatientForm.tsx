@@ -45,6 +45,41 @@ const isDate = (date: string): boolean => {
   return date.match(regex) != null;
 };
 
+const typeOptions: SelectFieldOption[] = [
+  { label: "HealthCheck", value: "HealthCheck" },
+  { label: "Hospital", value: "Hospital" },
+];
+
+const conditionalEntryFields = (type: string) => {
+  switch (type) {
+    case "HealthCheck":
+      return (
+        <SelectField
+          label="Rating"
+          name="healthCheckRating"
+          options={healthCheckRatingOptions}
+        />
+      );
+    case "Hospital":
+      return (
+        <>
+          <Field
+            label="Discharge Date"
+            placeholder="YYYY-MM-DD"
+            name="dischargeDate"
+            component={TextField}
+          />
+          <Field
+            label="Discharge Criteria"
+            placeholder="Discharge Criteria"
+            name="dischargeCriteria"
+            component={TextField}
+          />
+        </>
+      );
+  }
+};
+
 export const AddEntryForm = ({ onSubmit, onCancel }: EntryProps) => {
   const [{ diagnoses }] = useStateValue();
 
@@ -75,10 +110,22 @@ export const AddEntryForm = ({ onSubmit, onCancel }: EntryProps) => {
           errors.description = requiredError;
         }
 
+        if (values.type === "Hospital") {
+          if (!values.dischargeDate) {
+            errors.dischargeDate = requiredError;
+          }
+          if (values.dischargeDate && !isDate(values.dischargeDate)) {
+            errors.dischargeDate = "Required format: YYYY-MM-DD";
+          }
+          if (!values.dischargeCriteria) {
+            errors.dischargeCriteria = requiredError;
+          }
+        }
+
         return errors;
       }}
     >
-      {({ dirty, isValid, setFieldTouched, setFieldValue }) => {
+      {({ dirty, isValid, setFieldTouched, setFieldValue, values }) => {
         return (
           <Form className="form ui">
             <Field
@@ -104,11 +151,8 @@ export const AddEntryForm = ({ onSubmit, onCancel }: EntryProps) => {
               setFieldTouched={setFieldTouched}
               setFieldValue={setFieldValue}
             />
-            <SelectField
-              label="Rating"
-              name="healthCheckRating"
-              options={healthCheckRatingOptions}
-            />
+            <SelectField label="Type" name="type" options={typeOptions} />
+            {conditionalEntryFields(values.type)}
             <Grid>
               <Grid item>
                 <Button

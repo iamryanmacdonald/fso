@@ -35,9 +35,21 @@ const PatientPage = () => {
   const submitNewEntry = async (values: EntryFormValues) => {
     try {
       if (patientId) {
+        let postValues = {};
+
+        if (values.type === "Hospital") {
+          postValues = {
+            ...values,
+            discharge: {
+              date: values.dischargeDate,
+              criteria: values.dischargeCriteria,
+            },
+          };
+        }
+
         const { data: updatedPatient } = await axios.post<Patient>(
           `${apiBaseUrl}/patients/${patientId}/entries`,
-          values
+          postValues
         );
 
         dispatch(addPatient(updatedPatient));
