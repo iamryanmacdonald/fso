@@ -17,7 +17,7 @@ export interface Diagnosis {
   latin?: string;
 }
 
-interface BaseEntry {
+export interface BaseEntry {
   id: string;
   date: string;
   type: string;
@@ -52,6 +52,23 @@ export type Entry =
   | HealthCheckEntry
   | HospitalEntry
   | OccupationalHealthcareEntry;
+
+export type NewBaseEntry = Omit<BaseEntry, "id">;
+export type NewEntry =
+  | Omit<HealthCheckEntry, "id">
+  | Omit<HospitalEntry, "id">
+  | Omit<OccupationalHealthcareEntry, "id">;
+export type NewEntryFields = {
+  date: unknown;
+  type: unknown;
+  specialist: unknown;
+  diagnosisCodes?: unknown;
+  description: unknown;
+  healthCheckRating?: unknown;
+  discharge?: unknown;
+  employerName?: unknown;
+  sickLeave?: unknown;
+};
 
 export interface Patient {
   id: string;

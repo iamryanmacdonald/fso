@@ -35,4 +35,16 @@ router.post("/", (req, res) => {
   }
 });
 
+router.post("/:id/entries", (req, res) => {
+  try {
+    const newEntry = utils.toNewEntry(req.body);
+
+    res.json(newEntry);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send(error.message);
+    }
+  }
+});
+
 export default router;
