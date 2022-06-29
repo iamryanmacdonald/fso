@@ -23,6 +23,7 @@ router.get("/:id", (req, res) => {
 
 router.post("/", (req, res) => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const newPatient = utils.toNewPatient(req.body);
 
     const addedPatient = patientService.addPatient(newPatient);
@@ -37,6 +38,7 @@ router.post("/", (req, res) => {
 
 router.post("/:id/entries", (req, res) => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const newEntry = utils.toNewEntry(req.body);
 
     const updatedPatient = patientService.addEntry(req.params.id, newEntry);

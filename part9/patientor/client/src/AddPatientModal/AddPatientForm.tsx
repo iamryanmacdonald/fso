@@ -2,8 +2,14 @@ import React from "react";
 import { Grid, Button } from "@material-ui/core";
 import { Field, Formik, Form } from "formik";
 
-import { TextField, SelectField, GenderOption } from "./FormField";
-import { Gender, Patient } from "../types";
+import {
+  TextField,
+  SelectField,
+  DiagnosisSelection,
+  SelectFieldOption,
+} from "./FormField";
+import { EntryFormValues, Gender, HealthCheckRating, Patient } from "../types";
+import { useStateValue } from "../state";
 
 /*
  * use type Patient, but omit id and entries,
@@ -16,11 +22,124 @@ interface Props {
   onCancel: () => void;
 }
 
-const genderOptions: GenderOption[] = [
+interface EntryProps {
+  onSubmit: (values: EntryFormValues) => void;
+  onCancel: () => void;
+}
+
+const genderOptions: SelectFieldOption[] = [
   { value: Gender.Male, label: "Male" },
   { value: Gender.Female, label: "Female" },
   { value: Gender.Other, label: "Other" },
 ];
+
+const healthCheckRatingOptions: SelectFieldOption[] = (
+  Object.keys(HealthCheckRating) as Array<keyof typeof HealthCheckRating>
+)
+  .filter((key) => isNaN(Number(key)))
+  .map((key) => ({ label: key, value: HealthCheckRating[key] }));
+
+const isDate = (date: string): boolean => {
+  const regex = /^\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])/;
+
+  return date.match(regex) != null;
+};
+
+export const AddEntryForm = ({ onSubmit, onCancel }: EntryProps) => {
+  const [{ diagnoses }] = useStateValue();
+
+  return (
+    <Formik
+      initialValues={{
+        date: "",
+        type: "HealthCheck",
+        specialist: "",
+        diagnosisCodes: [],
+        description: "",
+        healthCheckRating: 0,
+      }}
+      onSubmit={onSubmit}
+      validate={(values) => {
+        const requiredError = "Field is required";
+        const errors: { [field: string]: string } = {};
+        if (!values.date) {
+          errors.date = requiredError;
+        }
+        if (!isDate(values.date)) {
+          errors.date = "Required format: YYYY-MM-DD";
+        }
+        if (!values.specialist) {
+          errors.specialist = requiredError;
+        }
+        if (!values.description) {
+          errors.description = requiredError;
+        }
+
+        return errors;
+      }}
+    >
+      {({ dirty, isValid, setFieldTouched, setFieldValue }) => {
+        return (
+          <Form className="form ui">
+            <Field
+              label="Date"
+              placeholder="YYYY-MM-DD"
+              name="date"
+              component={TextField}
+            />
+            <Field
+              label="Specialist"
+              placeholder="Specialist"
+              name="specialist"
+              component={TextField}
+            />
+            <Field
+              label="Description"
+              placeholder="Description"
+              name="description"
+              component={TextField}
+            />
+            <DiagnosisSelection
+              diagnoses={Object.values(diagnoses)}
+              setFieldTouched={setFieldTouched}
+              setFieldValue={setFieldValue}
+            />
+            <SelectField
+              label="Rating"
+              name="healthCheckRating"
+              options={healthCheckRatingOptions}
+            />
+            <Grid>
+              <Grid item>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  style={{ float: "left" }}
+                  type="button"
+                  onClick={onCancel}
+                >
+                  Cancel
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  style={{
+                    float: "right",
+                  }}
+                  type="submit"
+                  variant="contained"
+                  disabled={!dirty || !isValid}
+                >
+                  Add
+                </Button>
+              </Grid>
+            </Grid>
+          </Form>
+        );
+      }}
+    </Formik>
+  );
+};
 
 export const AddPatientForm = ({ onSubmit, onCancel }: Props) => {
   return (
