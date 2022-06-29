@@ -45,6 +45,16 @@ const PatientPage = () => {
               criteria: values.dischargeCriteria,
             },
           };
+        } else if (values.type === "OccupationalHealthcare") {
+          postValues = {
+            ...values,
+            sickLeave: {
+              startDate: values.sickLeaveStartDate,
+              endDate: values.sickLeaveEndDate,
+            },
+          };
+        } else {
+          postValues = values;
         }
 
         const { data: updatedPatient } = await axios.post<Patient>(

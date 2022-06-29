@@ -46,8 +46,9 @@ const isDate = (date: string): boolean => {
 };
 
 const typeOptions: SelectFieldOption[] = [
-  { label: "HealthCheck", value: "HealthCheck" },
+  { label: "Health Check", value: "HealthCheck" },
   { label: "Hospital", value: "Hospital" },
+  { label: "Occupational Healthcare", value: "OccupationalHealthcare" },
 ];
 
 const conditionalEntryFields = (type: string) => {
@@ -73,6 +74,29 @@ const conditionalEntryFields = (type: string) => {
             label="Discharge Criteria"
             placeholder="Discharge Criteria"
             name="dischargeCriteria"
+            component={TextField}
+          />
+        </>
+      );
+    case "OccupationalHealthcare":
+      return (
+        <>
+          <Field
+            label="Employer Name"
+            placeholder="Employer Name"
+            name="employerName"
+            component={TextField}
+          />
+          <Field
+            label="Sick Leave Start Date"
+            placeholder="YYYY-MM-DD"
+            name="sickLeaveStartDate"
+            component={TextField}
+          />
+          <Field
+            label="Sick Leave End Date"
+            placeholder="YYYY-MM-DD"
+            name="sickLeaveEndDate"
             component={TextField}
           />
         </>
@@ -119,6 +143,16 @@ export const AddEntryForm = ({ onSubmit, onCancel }: EntryProps) => {
           }
           if (!values.dischargeCriteria) {
             errors.dischargeCriteria = requiredError;
+          }
+        } else if (values.type === "OccupationalHealthcare") {
+          if (!values.employerName) {
+            errors.employerName = requiredError;
+          }
+          if (values.sickLeaveStartDate && !isDate(values.sickLeaveStartDate)) {
+            errors.sickLeaveStartDate = "Required format: YYYY-MM-DD";
+          }
+          if (values.sickLeaveEndDate && !isDate(values.sickLeaveEndDate)) {
+            errors.sickLeaveEndDate = "Required format: YYYY-MM-DD";
           }
         }
 
